@@ -4,45 +4,61 @@ import {
   Box,
   Toolbar,
   IconButton,
-  Typography,
-  Menu,
   Container,
   Avatar,
   Button,
   Tooltip,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
   MenuItem,
-  // useTheme,
-  // useMediaQuery,
+  Menu,
 } from "@mui/material";
+import { Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
+import HomeIcon from "@mui/icons-material/Home";
+import CategoryIcon from "@mui/icons-material/Category";
+import InfoIcon from "@mui/icons-material/Info";
+import InventoryIcon from "@mui/icons-material/Inventory";
 import trustCartLogo from "../../assets/images/svgs/trust-cart-logo.svg";
 
-const pages = ["Home", "Products", "Categories", "About"];
-const settings = ["Profile", "Orders", "Wishlist", "Logout"];
+const pages = [
+  { name: "Home", icon: <HomeIcon /> },
+  { name: "Products", icon: <InventoryIcon /> },
+  { name: "Categories", icon: <CategoryIcon /> },
+  { name: "About", icon: <InfoIcon /> },
+];
 
 const Navbar = () => {
-  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-  // const theme = useTheme();
-  // const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
+  const settings = ["Profile", "Orders", "Wishlist", "Logout"];
+
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#fff" }}>
+    <AppBar
+      position="sticky"
+      sx={{
+        backgroundColor: "#fff",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           {/* Logo for desktop */}
@@ -55,34 +71,67 @@ const Navbar = () => {
             />
           </Box>
 
-          {/* Mobile menu */}
+          {/* Mobile menu button */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
+              onClick={toggleSidebar}
               sx={{ color: "#1A202C" }}
             >
               <MenuIcon />
             </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              keepMounted
-              transformOrigin={{ vertical: "top", horizontal: "left" }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: "block", md: "none" } }}
-            >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
           </Box>
+
+          {/* Sidebar for mobile */}
+          <Drawer
+            anchor="left"
+            open={isSidebarOpen}
+            onClose={toggleSidebar}
+            sx={{
+              "& .MuiDrawer-paper": {
+                width: 240,
+                boxSizing: "border-box",
+                backgroundColor: "#fff",
+              },
+            }}
+          >
+            <Box sx={{ pt: 2, pb: 2 }}>
+              <Box
+                component="img"
+                src={trustCartLogo}
+                alt="TrustCart"
+                sx={{ height: 35, ml: 2, mb: 2 }}
+              />
+              <List>
+                {pages.map((page) => (
+                  <ListItem
+                    component="button"
+                    key={page.name}
+                    onClick={toggleSidebar}
+                    sx={{
+                      width: "100%",
+                      textAlign: "left",
+                      border: "none",
+                      background: "none",
+                      padding: "8px 16px",
+                      cursor: "pointer",
+                      "&:hover": {
+                        backgroundColor: "#f0f7ff",
+                        "& .MuiListItemIcon-root, & .MuiListItemText-primary": {
+                          color: "#3B82F6",
+                        },
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: "#1A202C" }}>
+                      {page.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={page.name} />
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          </Drawer>
 
           {/* Logo for mobile */}
           <Box sx={{ display: { xs: "flex", md: "none" }, flexGrow: 1 }}>
@@ -100,20 +149,19 @@ const Navbar = () => {
           >
             {pages.map((page) => (
               <Button
-                key={page}
-                onClick={handleCloseNavMenu}
+                key={page.name}
                 sx={{
                   color: "#1A202C",
                   display: "block",
                   "&:hover": { color: "#3B82F6" },
                 }}
               >
-                {page}
+                {page.name}
               </Button>
             ))}
           </Box>
 
-          {/* Cart and User menu */}
+          {/* Cart and User menu remain unchanged */}
           <Box sx={{ flexGrow: 0, display: "flex", gap: 2 }}>
             <IconButton sx={{ color: "#1A202C" }}>
               <ShoppingCartIcon />
@@ -129,9 +177,15 @@ const Navbar = () => {
               sx={{ mt: "45px" }}
               id="menu-appbar"
               anchorEl={anchorElUser}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
               keepMounted
-              transformOrigin={{ vertical: "top", horizontal: "right" }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
