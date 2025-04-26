@@ -1,0 +1,9 @@
+<svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <style>
+    .cart { fill: #3B82F6; }
+    .wheels { fill: #1A202C; }
+  </style>
+  <path class="cart" d="M8 8h8l8 32h24l8-20H20"/>
+  <circle class="wheels" cx="24" cy="52" r="4"/>
+  <circle class="wheels" cx="48" cy="52" r="4"/>
+</svg>
