@@ -20,6 +20,7 @@ import trustCartLogo from "../../assets/images/svgs/trust-cart-logo.svg";
 const Footer = () => {
   return (
     <Box
+      component="footer"
       sx={{
         bgcolor: "#fff",
         color: "#1A202C",

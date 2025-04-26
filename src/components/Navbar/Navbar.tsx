@@ -53,6 +53,7 @@ const Navbar = () => {
 
   return (
     <AppBar
+      component="nav"
       position="sticky"
       sx={{
         backgroundColor: "#fff",
