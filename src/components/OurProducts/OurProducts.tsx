@@ -28,22 +28,18 @@ import type { Product } from "src/types/products.type";
 const OurProducts = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("-createdAt");
-  //   const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
 
   const getProducts = () => {
     return axios.get(
-      `/products?page=${page}&sort=${sort}&limit=1`
-      // &search=${search}`
+      `/products?${
+        search ? `search=${search}` : `page=${page}`
+      }&sort=${sort}&limit=1`
     );
   };
 
   const query = useQuery({
-    queryKey: [
-      "products",
-      page,
-      sort,
-      // search
-    ],
+    queryKey: ["products", page, sort, search],
     queryFn: getProducts,
   });
 
@@ -87,8 +83,8 @@ const OurProducts = () => {
         >
           <TextField
             placeholder="Search products..."
-            // value={search}
-            // onChange={(e) => setSearch(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             sx={{ minWidth: 200, flex: 1 }}
             InputProps={{
               startAdornment: (
