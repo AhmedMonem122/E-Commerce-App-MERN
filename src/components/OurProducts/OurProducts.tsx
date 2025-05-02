@@ -17,6 +17,7 @@ import {
   MenuItem,
   TextField,
   InputAdornment,
+  Skeleton,
 } from "@mui/material";
 import { useState } from "react";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -24,6 +25,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useQuery } from "@tanstack/react-query";
 import axios from "src/api/axios";
 import type { Product } from "src/types/products.type";
+import ProductSkeleton from "./ProductSkeleton";
 
 const OurProducts = () => {
   const [page, setPage] = useState(1);
@@ -112,98 +114,107 @@ const OurProducts = () => {
 
         {/* Products Grid */}
         <Grid container spacing={4} sx={{ mb: 4 }}>
-          {query.data?.data?.data?.products.map((product: Product) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product._id}>
-              <Card
-                sx={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  transition: "transform 0.2s, box-shadow 0.2s",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
-                  },
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={product.imageCover}
-                  alt={product.title}
-                  sx={{ objectFit: "cover" }}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography
-                    gutterBottom
-                    variant="h6"
-                    sx={{ fontSize: "1.1rem", fontWeight: 600 }}
-                  >
-                    {product.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    {product.description.slice(0, 100)}...
-                  </Typography>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    sx={{ mb: 1 }}
-                  >
-                    <Typography
-                      variant="h6"
-                      color="primary"
-                      sx={{ fontWeight: "bold" }}
-                    >
-                      ${product.price}
-                    </Typography>
-                    <Rating
-                      value={product.ratingsAverage}
-                      precision={0.1}
-                      readOnly
-                      size="small"
-                    />
-                  </Stack>
-                </CardContent>
-                <CardActions sx={{ p: 2, pt: 0 }}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={<ShoppingCartIcon />}
+          {query.isLoading
+            ? // Show 8 skeleton cards while loading
+              [...Array(8)].map((_, index) => <ProductSkeleton key={index} />)
+            : query.data?.data?.data?.products.map((product: Product) => (
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product._id}>
+                  <Card
                     sx={{
-                      backgroundColor: "#3B82F6",
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      transition: "transform 0.2s, box-shadow 0.2s",
                       "&:hover": {
-                        backgroundColor: "#2563EB",
+                        transform: "translateY(-4px)",
+                        boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
                       },
                     }}
                   >
-                    Add to Cart
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
+                    <CardMedia
+                      component="img"
+                      height="200"
+                      image={product.imageCover}
+                      alt={product.title}
+                      sx={{ objectFit: "cover" }}
+                    />
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography
+                        gutterBottom
+                        variant="h6"
+                        sx={{ fontSize: "1.1rem", fontWeight: 600 }}
+                      >
+                        {product.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 2 }}
+                      >
+                        {product.description.slice(0, 100)}...
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        sx={{ mb: 1 }}
+                      >
+                        <Typography
+                          variant="h6"
+                          color="primary"
+                          sx={{ fontWeight: "bold" }}
+                        >
+                          ${product.price}
+                        </Typography>
+                        <Rating
+                          value={product.ratingsAverage}
+                          precision={0.1}
+                          readOnly
+                          size="small"
+                        />
+                      </Stack>
+                    </CardContent>
+                    <CardActions sx={{ p: 2, pt: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        startIcon={<ShoppingCartIcon />}
+                        sx={{
+                          backgroundColor: "#3B82F6",
+                          "&:hover": {
+                            backgroundColor: "#2563EB",
+                          },
+                        }}
+                      >
+                        Add to Cart
+                      </Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
         </Grid>
 
         {/* Pagination */}
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Pagination
-            count={query.data?.data?.metadata?.numberOfPages || 1}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-            size="large"
-            sx={{
-              "& .MuiPaginationItem-root": {
-                fontSize: "1.1rem",
-              },
-            }}
-          />
-        </Box>
+        {query.isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Skeleton variant="rounded" width={300} height={40} />
+          </Box>
+        ) : (
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Pagination
+              count={query.data?.data?.metadata?.numberOfPages || 1}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              size="large"
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  fontSize: "1.1rem",
+                },
+              }}
+            />
+          </Box>
+        )}
       </Container>
     </Box>
   );
