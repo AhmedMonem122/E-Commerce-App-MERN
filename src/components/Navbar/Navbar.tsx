@@ -6,7 +6,6 @@ import {
   IconButton,
   Container,
   Avatar,
-  Button,
   Tooltip,
   Drawer,
   List,
@@ -15,6 +14,7 @@ import {
   ListItemIcon,
   MenuItem,
   Menu,
+  Link as MUILink,
 } from "@mui/material";
 import { Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -25,12 +25,13 @@ import CategoryIcon from "@mui/icons-material/Category";
 import InfoIcon from "@mui/icons-material/Info";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import trustCartLogo from "../../assets/images/svgs/trust-cart-logo.svg";
+import { Link, NavLink } from "react-router";
 
 const pages = [
-  { name: "Home", icon: <HomeIcon /> },
-  { name: "Products", icon: <InventoryIcon /> },
-  { name: "Categories", icon: <CategoryIcon /> },
-  { name: "About", icon: <InfoIcon /> },
+  { name: "Home", icon: <HomeIcon />, url: "/" },
+  { name: "Products", icon: <InventoryIcon />, url: "/products" },
+  { name: "Categories", icon: <CategoryIcon />, url: "/categories" },
+  { name: "About", icon: <InfoIcon />, url: "/about" },
 ];
 
 const Navbar = () => {
@@ -63,15 +64,18 @@ const Navbar = () => {
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           {/* Logo for desktop */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, mr: 2 }}>
+          <MUILink
+            component={Link}
+            to="/"
+            sx={{ display: { xs: "none", md: "flex" }, mr: 2 }}
+          >
             <Box
               component="img"
               src={trustCartLogo}
               alt="TrustCart"
               sx={{ height: 40 }}
             />
-          </Box>
-
+          </MUILink>
           {/* Mobile menu button */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
@@ -82,7 +86,6 @@ const Navbar = () => {
               <MenuIcon />
             </IconButton>
           </Box>
-
           {/* Sidebar for mobile */}
           <Drawer
             anchor="left"
@@ -97,16 +100,19 @@ const Navbar = () => {
             }}
           >
             <Box sx={{ pt: 2, pb: 2 }}>
-              <Box
-                component="img"
-                src={trustCartLogo}
-                alt="TrustCart"
-                sx={{ height: 35, ml: 2, mb: 2 }}
-              />
+              <MUILink component={Link} to="/">
+                <Box
+                  component="img"
+                  src={trustCartLogo}
+                  alt="TrustCart"
+                  sx={{ height: 35, ml: 2, mb: 2 }}
+                />
+              </MUILink>
               <List>
                 {pages.map((page) => (
                   <ListItem
-                    component="button"
+                    component={NavLink}
+                    to={page.url}
                     key={page.name}
                     onClick={toggleSidebar}
                     sx={{
@@ -116,10 +122,21 @@ const Navbar = () => {
                       background: "none",
                       padding: "8px 16px",
                       cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      borderRadius: "8px",
+                      margin: "4px auto",
+                      color: "#1A202C",
                       "&:hover": {
                         backgroundColor: "#f0f7ff",
                         "& .MuiListItemIcon-root, & .MuiListItemText-primary": {
                           color: "#3B82F6",
+                        },
+                      },
+                      "&.active": {
+                        backgroundColor: "#f0f7ff",
+                        "& .MuiListItemIcon-root, & .MuiListItemText-primary": {
+                          color: "#3B82F6",
+                          fontWeight: 600,
                         },
                       },
                     }}
@@ -133,36 +150,65 @@ const Navbar = () => {
               </List>
             </Box>
           </Drawer>
-
           {/* Logo for mobile */}
           <Box sx={{ display: { xs: "flex", md: "none" }, flexGrow: 1 }}>
-            <Box
-              component="img"
-              src={trustCartLogo}
-              alt="TrustCart"
-              sx={{ height: 35 }}
-            />
+            <MUILink component={Link} to="/">
+              <Box
+                component="img"
+                src={trustCartLogo}
+                alt="TrustCart"
+                sx={{ height: 35 }}
+              />
+            </MUILink>
           </Box>
-
           {/* Desktop menu */}
           <Box
             sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, gap: 2 }}
           >
             {pages.map((page) => (
-              <Button
+              <MUILink
+                component={NavLink}
+                to={page.url}
                 key={page.name}
                 sx={{
                   color: "#1A202C",
                   display: "block",
-                  "&:hover": { color: "#3B82F6" },
+                  textDecoration: "none",
+                  position: "relative",
+                  padding: "8px 12px",
+                  fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
+                  fontWeight: 500,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    color: "#3B82F6",
+                    "&::after": {
+                      width: "100%",
+                    },
+                  },
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    bottom: 0,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: 0,
+                    height: "2px",
+                    backgroundColor: "#3B82F6",
+                    transition: "width 0.3s ease",
+                  },
+                  "&.active": {
+                    color: "#3B82F6",
+                    fontWeight: 600,
+                    "&::after": {
+                      width: "100%",
+                    },
+                  },
                 }}
               >
                 {page.name}
-              </Button>
+              </MUILink>
             ))}
           </Box>
-
-          {/* Cart and User menu remain unchanged */}
           <Box sx={{ flexGrow: 0, display: "flex", gap: 2 }}>
             <IconButton sx={{ color: "#1A202C" }}>
               <ShoppingCartIcon />
