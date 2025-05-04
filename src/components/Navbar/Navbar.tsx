@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AppBar,
   Box,
@@ -51,6 +51,12 @@ const Navbar = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    setIsAuthenticated(!!localStorage.getItem("token"));
+  }, []);
 
   return (
     <AppBar
@@ -209,40 +215,89 @@ const Navbar = () => {
               </MUILink>
             ))}
           </Box>
-          <Box sx={{ flexGrow: 0, display: "flex", gap: 2 }}>
-            <IconButton sx={{ color: "#1A202C" }}>
-              <ShoppingCartIcon />
-            </IconButton>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar sx={{ bgcolor: "#3B82F6" }}>
-                  <PersonIcon />
-                </Avatar>
+          {isAuthenticated ? (
+            <Box sx={{ flexGrow: 0, display: "flex", gap: 2 }}>
+              <IconButton sx={{ color: "#1A202C" }}>
+                <ShoppingCartIcon />
               </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar sx={{ bgcolor: "#3B82F6" }}>
+                    <PersonIcon />
+                  </Avatar>
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          ) : (
+            <Box sx={{ flexGrow: 0, display: "flex", gap: 2 }}>
+              <MUILink
+                component={NavLink}
+                to="/login"
+                sx={{
+                  color: "#1A202C",
+                  textDecoration: "none",
+                  "&:hover": { color: "#3B82F6" },
+                  "&.active": {
+                    color: "#3B82F6",
+                    fontWeight: 600,
+                  },
+                }}
+              >
+                <Typography
+                  textAlign="center"
+                  sx={{
+                    fontWeight: "inherit",
+                  }}
+                >
+                  Login
+                </Typography>
+              </MUILink>
+              <MUILink
+                component={NavLink}
+                to="/register"
+                sx={{
+                  color: "#1A202C",
+                  textDecoration: "none",
+                  "&:hover": { color: "#3B82F6" },
+                  "&.active": {
+                    color: "#3B82F6",
+                    fontWeight: 600,
+                  },
+                }}
+              >
+                <Typography
+                  textAlign="center"
+                  sx={{
+                    fontWeight: "inherit",
+                  }}
+                >
+                  Register
+                </Typography>
+              </MUILink>
+            </Box>
+          )}
         </Toolbar>
       </Container>
     </AppBar>
