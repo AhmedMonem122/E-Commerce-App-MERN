@@ -9,23 +9,78 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import { useState } from "react";
-import { Link as RouterLink } from "react-router";
+import { useActionState, useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import loginIllustration from "../../assets/images/svgs/login-illustration.svg";
+import axios from "../../api/axios";
+
+type LoginState = {
+  email: string;
+  password: string;
+  error: string | null;
+};
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle login logic here
+  const navigate = useNavigate();
+
+  const initialState: LoginState = {
+    email: "",
+    password: "",
+    error: null,
   };
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: { email: string; password: string }) => {
+      return axios.post("/users/signin", data);
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.data.token);
+      navigate("/");
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const loginAction = async (prevState: LoginState, formData: FormData) => {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email || !password) {
+      return {
+        ...prevState,
+        error: "Email and password are required",
+      };
+    }
+
+    try {
+      loginMutation.mutate({ email, password });
+
+      if (loginMutation.data?.data?.token) {
+        localStorage.setItem("token", loginMutation.data?.data?.token);
+        return { ...prevState, error: null };
+      }
+
+      return {
+        ...prevState,
+        error: "Invalid credentials",
+      };
+    } catch (error) {
+      return {
+        ...prevState,
+        error: error instanceof Error ? error.message : "Login failed",
+      };
+    }
+  };
+
+  const [state, formAction] = useActionState(loginAction, initialState);
 
   return (
     <Box
@@ -90,7 +145,7 @@ const LoginPage = () => {
                 Please sign in to your account
               </Typography>
 
-              <Box component="form" onSubmit={handleSubmit} noValidate>
+              <Box component="form" action={formAction} noValidate>
                 <TextField
                   margin="normal"
                   required
@@ -100,8 +155,10 @@ const LoginPage = () => {
                   name="email"
                   autoComplete="email"
                   autoFocus
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  error={!!state.error || !!loginMutation.error}
+                  helperText={
+                    state.error || (loginMutation.error as Error)?.message
+                  }
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -119,8 +176,7 @@ const LoginPage = () => {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  error={!!state.error}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -164,6 +220,7 @@ const LoginPage = () => {
                   type="submit"
                   fullWidth
                   variant="contained"
+                  disabled={loginMutation.isPending}
                   sx={{
                     mt: 1,
                     mb: 3,
@@ -172,7 +229,7 @@ const LoginPage = () => {
                     "&:hover": { backgroundColor: "#2563EB" },
                   }}
                 >
-                  Sign In
+                  {loginMutation.isPending ? "Signing in..." : "Sign In"}
                 </Button>
 
                 <Typography
@@ -194,6 +251,7 @@ const LoginPage = () => {
                     Sign up
                   </Link>
                 </Typography>
+
               </Box>
             </Paper>
           </Box>
