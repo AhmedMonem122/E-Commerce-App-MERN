@@ -12,6 +12,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import Navbar from "src/components/Navbar/Navbar";
 import Footer from "src/components/Footer/Footer";
+import AuthContextProvider from "src/context/AuthContextProvider";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -32,6 +33,8 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const queryClient = new QueryClient();
+
   return (
     <html lang="en">
       <head>
@@ -41,24 +44,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Navbar />
-        {children}
-        <Footer />
-        <ScrollRestoration />
-        <Scripts />
+        <QueryClientProvider client={queryClient}>
+          <AuthContextProvider>
+            <Navbar />
+            {children}
+            <Footer />
+            <ScrollRestoration />
+            <Scripts />
+          </AuthContextProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );
 }
 
 export default function App() {
-  const queryClient = new QueryClient();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
-  );
+  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

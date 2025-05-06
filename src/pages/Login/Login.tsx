@@ -20,6 +20,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import loginIllustration from "../../assets/images/svgs/login-illustration.svg";
 import axios from "../../api/axios";
+import useAuth from "src/hooks/use-auth";
 
 type LoginState = {
   email: string;
@@ -29,6 +30,8 @@ type LoginState = {
 };
 
 const LoginPage = () => {
+  const { setIsAuthenticated } = useAuth();
+
   const [showPassword, setShowPassword] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -51,6 +54,7 @@ const LoginPage = () => {
     },
     onSuccess: (data) => {
       localStorage.setItem("token", data.data.token);
+      setIsAuthenticated(true);
       setSnackbar({
         open: true,
         message: "Successfully logged in! Welcome back!",

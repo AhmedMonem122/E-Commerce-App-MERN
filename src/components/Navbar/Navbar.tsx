@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   AppBar,
   Box,
@@ -26,6 +26,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import trustCartLogo from "../../assets/images/svgs/trust-cart-logo.svg";
 import { Link, NavLink } from "react-router";
+import useAuth from "src/hooks/use-auth";
 
 const pages = [
   { name: "Home", icon: <HomeIcon />, url: "/" },
@@ -35,6 +36,8 @@ const pages = [
 ];
 
 const Navbar = () => {
+  const { isAuthenticated } = useAuth();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -51,12 +54,6 @@ const Navbar = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    setIsAuthenticated(!!localStorage.getItem("token"));
-  }, []);
 
   return (
     <AppBar
