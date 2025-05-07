@@ -25,7 +25,7 @@ import CategoryIcon from "@mui/icons-material/Category";
 import InfoIcon from "@mui/icons-material/Info";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import trustCartLogo from "../../assets/images/svgs/trust-cart-logo.svg";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import useAuth from "src/hooks/use-auth";
 
 const pages = [
@@ -36,19 +36,31 @@ const pages = [
 ];
 
 const Navbar = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, handleLogout } = useAuth();
+
+  const navigate = useNavigate();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-  const settings = ["Profile", "Orders", "Wishlist", "Logout"];
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleGoToSetting = (route: string) => {
+    navigate(route);
+    handleCloseUserMenu();
+  };
+
+  const settings = [
+    { name: "Profile", onClick: () => handleGoToSetting("/profile") },
+    { name: "Orders", onClick: () => handleGoToSetting("/allOrders") },
+    { name: "Wishlist", onClick: () => handleGoToSetting("/wishlist") },
+    { name: "Logout", onClick: handleLogout },
+  ];
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
   };
 
   const toggleSidebar = () => {
@@ -241,8 +253,15 @@ const Navbar = () => {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
+                  <MenuItem
+                    component="button"
+                    key={setting.name}
+                    onClick={setting.onClick}
+                    sx={{
+                      width: "100%",
+                    }}
+                  >
+                    <Typography textAlign="center">{setting.name}</Typography>
                   </MenuItem>
                 ))}
               </Menu>
