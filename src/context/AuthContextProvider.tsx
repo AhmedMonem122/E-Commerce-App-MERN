@@ -28,11 +28,9 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, setIsAuthenticated, handleLogout }}
-    >
+    <AuthContext value={{ isAuthenticated, setIsAuthenticated, handleLogout }}>
       {children}
-    </AuthContext.Provider>
+    </AuthContext>
   );
 };
 
