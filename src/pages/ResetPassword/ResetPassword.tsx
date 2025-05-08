@@ -60,7 +60,7 @@ const ResetPasswordPage = () => {
         "tokenError" | "passwordError" | "passwordConfirmError"
       >
     ) => {
-      return axios.post(`/users/resetPassword/${data.token}`, data);
+      return axios.put(`/users/resetPassword/${data.token}`, data);
     },
     onSuccess: () => {
       setSnackbar({
