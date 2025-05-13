@@ -1,0 +1,37 @@
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Elements -->
+  <circle cx="300" cy="200" r="180" fill="#EFF6FF" />
+  <circle cx="300" cy="200" r="140" fill="#DBEAFE" />
+  
+  <!-- Store Building -->
+  <rect x="200" y="120" width="200" height="160" fill="white" stroke="#3B82F6" stroke-width="4"/>
+  <path d="M180 120L300 80L420 120" fill="#3B82F6" stroke="#3B82F6" stroke-width="4"/>
+  
+  <!-- Store Front -->
+  <rect x="260" y="200" width="80" height="80" fill="#BFDBFE" stroke="#3B82F6" stroke-width="2"/>
+  <rect x="290" y="200" width="20" height="80" fill="#3B82F6"/>
+  
+  <!-- Windows -->
+  <rect x="220" y="140" width="40" height="40" fill="#BFDBFE" stroke="#3B82F6" stroke-width="2"/>
+  <rect x="340" y="140" width="40" height="40" fill="#BFDBFE" stroke="#3B82F6" stroke-width="2"/>
+  
+  <!-- Shopping Cart -->
+  <circle cx="180" cy="300" r="20" fill="#3B82F6"/>
+  <circle cx="220" cy="300" r="20" fill="#3B82F6"/>
+  <path d="M160 280L240 280L220 240L180 240Z" fill="#3B82F6"/>
+  
+  <!-- Trust Shield -->
+  <path d="M380 260L400 240L420 260L400 320L380 260Z" fill="#3B82F6"/>
+  <circle cx="400" cy="280" r="15" fill="white"/>
+  <path d="M395 280L400 285L410 275" stroke="#3B82F6" stroke-width="3"/>
+  
+  <!-- Decorative Elements -->
+  <circle cx="160" cy="160" r="8" fill="#60A5FA"/>
+  <circle cx="440" cy="160" r="8" fill="#60A5FA"/>
+  <circle cx="300" cy="40" r="10" fill="#60A5FA"/>
+  
+  <!-- Stars -->
+  <path d="M180 100L190 110M180 110L190 100" stroke="#3B82F6" stroke-width="2"/>
+  <path d="M410 100L420 110M410 110L420 100" stroke="#3B82F6" stroke-width="2"/>
+  <path d="M300 340L310 350M300 350L310 340" stroke="#3B82F6" stroke-width="2"/>
+</svg>
