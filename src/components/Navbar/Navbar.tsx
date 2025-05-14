@@ -22,6 +22,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
 import HomeIcon from "@mui/icons-material/Home";
 import CategoryIcon from "@mui/icons-material/Category";
+import StorefrontIcon from "@mui/icons-material/Storefront";
 import InfoIcon from "@mui/icons-material/Info";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import trustCartLogo from "../../assets/images/svgs/trust-cart-logo.svg";
@@ -31,6 +32,7 @@ import useAuth from "src/hooks/use-auth";
 const pages = [
   { name: "Home", icon: <HomeIcon />, url: "/" },
   { name: "Products", icon: <InventoryIcon />, url: "/products" },
+  { name: "Brands", icon: <StorefrontIcon />, url: "/brands" },
   { name: "Categories", icon: <CategoryIcon />, url: "/categories" },
   { name: "About", icon: <InfoIcon />, url: "/about" },
 ];
