@@ -25,28 +25,30 @@ type Brand = {
   _id: string;
   title: string;
   image: string;
+  description: string;
+  category: string;
+  products: string[];
+};
+
+type Category = {
+  _id: string;
+  title: string;
 };
 
 const BrandsPage = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  //   const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState("");
   const [sort, setSort] = useState("title");
 
   const { data, isLoading } = useQuery({
-    queryKey: [
-      "brands",
-      page,
-      search,
-      //  category,
-      sort,
-    ],
+    queryKey: ["brands", page, search, category, sort],
     queryFn: async () => {
       const response = await axios.get("/brands", {
         params: {
           page,
           search,
-          //   category: category === "all" ? undefined : category,
+          category: category === "" ? undefined : category,
           sort,
         },
       });
@@ -54,14 +56,21 @@ const BrandsPage = () => {
     },
   });
 
-  const categories = [
-    "Electronics",
-    "Fashion",
-    "Home & Living",
-    "Beauty",
-    "Sports",
-    "Automotive",
-  ];
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const response = await axios.get("/categories");
+      return response.data;
+    },
+  });
+
+  const categories =
+    categoriesData?.data?.categories.map((cat: Category) => {
+      return {
+        _id: cat._id,
+        title: cat.title,
+      };
+    }) || [];
 
   return (
     <Box
@@ -113,15 +122,15 @@ const BrandsPage = () => {
             <FormControl fullWidth>
               <InputLabel>Category</InputLabel>
               <Select
-                // value={category}
+                value={category}
                 label="Category"
-                // onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => setCategory(e.target.value)}
                 sx={{ backgroundColor: "white" }}
               >
-                <MenuItem value="all">All Categories</MenuItem>
-                {categories.map((cat) => (
-                  <MenuItem key={cat} value={cat.toLowerCase()}>
-                    {cat}
+                <MenuItem value="">All Categories</MenuItem>
+                {categories.map((cat: Category) => (
+                  <MenuItem key={cat._id} value={cat._id}>
+                    {cat.title}
                   </MenuItem>
                 ))}
               </Select>
@@ -137,7 +146,7 @@ const BrandsPage = () => {
                 sx={{ backgroundColor: "white" }}
               >
                 <MenuItem value="title">Title</MenuItem>
-                <MenuItem value="productsCount">Products Count</MenuItem>
+                <MenuItem value="-products">Products Count</MenuItem>
                 <MenuItem value="updatedAt">Newest</MenuItem>
               </Select>
             </FormControl>
@@ -150,20 +159,18 @@ const BrandsPage = () => {
           spacing={1}
           sx={{ mb: 4, flexWrap: "wrap", gap: 1 }}
         >
-          {categories.map((cat) => (
+          {categories.map((cat: Category) => (
             <Chip
-              key={cat}
-              label={cat}
-              //   onClick={() => setCategory(cat.toLowerCase())}
-              //   sx={{
-              //     backgroundColor:
-              //       category === cat.toLowerCase() ? "#3B82F6" : "white",
-              //     color: category === cat.toLowerCase() ? "white" : "#1A202C",
-              //     "&:hover": {
-              //       backgroundColor:
-              //         category === cat.toLowerCase() ? "#2563EB" : "#F1F5F9",
-              //     },
-              //   }}
+              key={cat._id}
+              label={cat.title}
+              onClick={() => setCategory(cat._id)}
+              sx={{
+                backgroundColor: category === cat._id ? "#3B82F6" : "white",
+                color: category === cat._id ? "white" : "#1A202C",
+                "&:hover": {
+                  backgroundColor: category === cat._id ? "#2563EB" : "#F1F5F9",
+                },
+              }}
             />
           ))}
         </Stack>
@@ -219,8 +226,7 @@ const BrandsPage = () => {
                         color="text.secondary"
                         sx={{ mb: 2 }}
                       >
-                        {/* {brand.description} */}
-                        Hello Description
+                        {brand.description}
                       </Typography>
                       <Stack
                         direction="row"
@@ -228,13 +234,16 @@ const BrandsPage = () => {
                         alignItems="center"
                       >
                         <Chip
-                          //   label={brand.category}
-                          label="Electronics"
+                          label={
+                            categories.find(
+                              (cat: Category) => cat._id === brand.category
+                            )?.title || "Unknown Category"
+                          }
                           size="small"
                           sx={{ backgroundColor: "#F1F5F9" }}
                         />
                         <Typography variant="body2" color="text.secondary">
-                          {/* {brand.productsCount} Products */}3 Products
+                          {brand.products.length} Products
                         </Typography>
                       </Stack>
                     </CardContent>
