@@ -26,8 +26,10 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "src/api/axios";
 import type { Product } from "src/types/products.type";
 import ProductSkeleton from "./ProductSkeleton";
+import { useNavigate } from "react-router";
 
 const OurProducts = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("-createdAt");
   const [search, setSearch] = useState("");
@@ -184,6 +186,9 @@ const OurProducts = () => {
                           "&:hover": {
                             backgroundColor: "#2563EB",
                           },
+                        }}
+                        onClick={() => {
+                          navigate(`/products/${product._id}`);
                         }}
                       >
                         Add to Cart

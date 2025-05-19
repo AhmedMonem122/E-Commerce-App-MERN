@@ -17,8 +17,11 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "src/api/axios";
 import type { TopCheapProduct } from "src/types/products.type";
 import ProductSkeleton from "./ProductSkeleton";
+import { useNavigate } from "react-router";
 
 const TopCheapProducts = () => {
+  const navigate = useNavigate();
+
   const getTopCheapProducts = () => {
     return axios.get("/products/top-5-cheap");
   };
@@ -144,6 +147,9 @@ const TopCheapProducts = () => {
                             "&:hover": {
                               backgroundColor: "#2563EB",
                             },
+                          }}
+                          onClick={() => {
+                            navigate(`/products/${product.id}`);
                           }}
                         >
                           Add to Cart
