@@ -5,7 +5,6 @@ import {
   Grid,
   Button,
   Rating,
-  Divider,
   TextField,
   Card,
   CardContent,
@@ -16,18 +15,21 @@ import {
   DialogActions,
   Stack,
   Chip,
+  Snackbar,
   Alert,
   CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarIcon from "@mui/icons-material/Star";
 import axios from "../../api/axios";
 import useAuth from "../../hooks/use-auth";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 type Review = {
   _id: string;
@@ -64,15 +66,12 @@ const ProductDetailsPage = ({
     data: { product: Product };
   } | null;
 }) => {
-  const {
-    isAuthenticated,
-    // user
-  } = useAuth();
+  const { isAuthenticated, data: userData } = useAuth();
   const queryClient = useQueryClient();
   const [selectedImage, setSelectedImage] = useState(0);
   const [reviewDialog, setReviewDialog] = useState(false);
   const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
+  const [review, setReview] = useState("");
   const [editingReview, setEditingReview] = useState<Review | null>(null);
 
   const { data: brandData, isLoading: isBrandLoading } = useQuery({
@@ -93,23 +92,53 @@ const ProductDetailsPage = ({
     },
   });
 
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
+
   const addReviewMutation = useMutation({
-    mutationFn: async (data: { rating: number; comment: string }) => {
+    mutationFn: async (data: { rating: number; review: string }) => {
       return axios.post(`/products/${id}/reviews`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product", id] });
       handleCloseReviewDialog();
+      setSnackbar({
+        open: true,
+        message: "Review added successfully!",
+        severity: "success",
+      });
+    },
+    onError: (error: any) => {
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to add review",
+        severity: "error",
+      });
     },
   });
 
   const updateReviewMutation = useMutation({
-    mutationFn: async (data: { rating: number; comment: string }) => {
+    mutationFn: async (data: { rating: number; review: string }) => {
       return axios.patch(`/products/${id}/reviews/${editingReview?._id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product", id] });
       handleCloseReviewDialog();
+      setSnackbar({
+        open: true,
+        message: "Review updated successfully!",
+        severity: "success",
+      });
+    },
+    onError: (error: any) => {
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to update review",
+        severity: "error",
+      });
     },
   });
 
@@ -119,6 +148,66 @@ const ProductDetailsPage = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product", id] });
+      setSnackbar({
+        open: true,
+        message: "Review deleted successfully!",
+        severity: "success",
+      });
+    },
+    onError: (error: any) => {
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to delete review",
+        severity: "error",
+      });
+    },
+  });
+
+  const addReactionMutation = useMutation({
+    mutationFn: async (data: { reactions: string }) => {
+      return axios.post(`/products/${id}/reviews`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
+      setSnackbar({
+        open: true,
+        message: "Reaction added successfully!",
+        severity: "success",
+      });
+    },
+    onError: (error: any) => {
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to add reaction",
+        severity: "error",
+      });
+    },
+  });
+
+  const updateReactionMutation = useMutation({
+    mutationFn: async ({
+      reviewId,
+      reactions,
+    }: {
+      reviewId: string;
+      reactions: "Like" | "Dislike" | "Love";
+    }) => {
+      return axios.patch(`/products/${id}/reviews/${reviewId}`, { reactions });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
+      setSnackbar({
+        open: true,
+        message: "Reaction updated successfully!",
+        severity: "success",
+      });
+    },
+    onError: (error: any) => {
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to update reaction",
+        severity: "error",
+      });
     },
   });
 
@@ -126,11 +215,11 @@ const ProductDetailsPage = ({
     if (review) {
       setEditingReview(review);
       setRating(review.rating);
-      setComment(review.review);
+      setReview(review.review);
     } else {
       setEditingReview(null);
       setRating(0);
-      setComment("");
+      setReview("");
     }
     setReviewDialog(true);
   };
@@ -139,15 +228,21 @@ const ProductDetailsPage = ({
     setReviewDialog(false);
     setEditingReview(null);
     setRating(0);
-    setComment("");
+    setReview("");
   };
 
   const handleSubmitReview = () => {
     if (editingReview) {
-      updateReviewMutation.mutate({ rating, comment });
+      updateReviewMutation.mutate({ rating, review });
     } else {
-      addReviewMutation.mutate({ rating, comment });
+      addReviewMutation.mutate({ rating, review });
     }
+  };
+
+  const hasUserReviewed = () => {
+    return data?.data?.product?.reviews.some(
+      (review) => review.user._id === userData?.data?.user?._id
+    );
   };
 
   return (
@@ -284,7 +379,7 @@ const ProductDetailsPage = ({
             <Typography variant="h5" sx={{ fontWeight: 600 }}>
               Customer Reviews
             </Typography>
-            {isAuthenticated && (
+            {isAuthenticated && !hasUserReviewed() && (
               <Button
                 variant="outlined"
                 onClick={() => handleOpenReviewDialog()}
@@ -294,7 +389,6 @@ const ProductDetailsPage = ({
               </Button>
             )}
           </Stack>
-
           <Grid container spacing={3}>
             {data?.data?.product?.reviews.map((review) => (
               <Grid size={{ xs: 12 }} key={review._id}>
@@ -307,13 +401,13 @@ const ProductDetailsPage = ({
                       sx={{ mb: 2 }}
                     >
                       <Stack direction="row" spacing={2} alignItems="center">
-                        <Typography variant="h6">{review.user.name}</Typography>
+                        <Typography variant="h6">
+                          {review.user.name}
+                          {hasUserReviewed() && " (You)"}
+                        </Typography>
                         <Rating value={review.rating} readOnly size="small" />
                       </Stack>
-                      {isAuthenticated && (
-                        //   ===
-                        //        && user?._id
-                        //     review.user._id &&
+                      {isAuthenticated && hasUserReviewed() && (
                         <Stack direction="row" spacing={1}>
                           <IconButton
                             size="small"
@@ -336,6 +430,81 @@ const ProductDetailsPage = ({
                       {new Date(review.createdAt).toLocaleDateString()}
                     </Typography>
                     <Typography>{review.review}</Typography>
+
+                    {/* Add Reactions Section */}
+                    <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          review?.reactions &&
+                          !review?.reactions?.includes("Love")
+                            ? updateReactionMutation.mutate({
+                                reviewId: review._id,
+                                reactions: "Love",
+                              })
+                            : addReactionMutation.mutate({
+                                reactions: "Love",
+                              })
+                        }
+                        color={`${
+                          review.reactions.includes("Love")
+                            ? "error"
+                            : "default"
+                        }`}
+                      >
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <FavoriteIcon fontSize="small" />
+                        </Stack>
+                      </IconButton>
+
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          review?.reactions &&
+                          !review?.reactions?.includes("Like")
+                            ? updateReactionMutation.mutate({
+                                reviewId: review._id,
+                                reactions: "Like",
+                              })
+                            : addReactionMutation.mutate({
+                                reactions: "Like",
+                              })
+                        }
+                        color={`${
+                          review.reactions.includes("Like")
+                            ? "primary"
+                            : "default"
+                        }`}
+                      >
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <ThumbUpIcon fontSize="small" />
+                        </Stack>
+                      </IconButton>
+
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          review?.reactions &&
+                          !review?.reactions?.includes("Dislike")
+                            ? updateReactionMutation.mutate({
+                                reviewId: review._id,
+                                reactions: "Dislike",
+                              })
+                            : addReactionMutation.mutate({
+                                reactions: "Dislike",
+                              })
+                        }
+                        color={`${
+                          review.reactions.includes("Dislike")
+                            ? "primary"
+                            : "default"
+                        }`}
+                      >
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <ThumbDownIcon fontSize="small" />
+                        </Stack>
+                      </IconButton>
+                    </Stack>
                   </CardContent>
                 </Card>
               </Grid>
@@ -368,8 +537,8 @@ const ProductDetailsPage = ({
                   label="Your Review"
                   multiline
                   rows={4}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  value={review}
+                  onChange={(e) => setReview(e.target.value)}
                   fullWidth
                 />
               </Stack>
@@ -380,12 +549,26 @@ const ProductDetailsPage = ({
             <Button
               variant="contained"
               onClick={handleSubmitReview}
-              disabled={!rating || !comment}
+              disabled={!rating || !review}
             >
               {editingReview ? "Update Review" : "Submit Review"}
             </Button>
           </DialogActions>
         </Dialog>
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Container>
     </Box>
   );
