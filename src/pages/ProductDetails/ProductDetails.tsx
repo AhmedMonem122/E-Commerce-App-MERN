@@ -30,6 +30,7 @@ import useAuth from "../../hooks/use-auth";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useRevalidator } from "react-router";
 
 type Review = {
   _id: string;
@@ -68,6 +69,9 @@ const ProductDetailsPage = ({
 }) => {
   const { isAuthenticated, data: userData } = useAuth();
   const queryClient = useQueryClient();
+
+  const revalidator = useRevalidator();
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [reviewDialog, setReviewDialog] = useState(false);
   const [rating, setRating] = useState(0);
@@ -110,6 +114,7 @@ const ProductDetailsPage = ({
         message: "Review added successfully!",
         severity: "success",
       });
+      revalidator.revalidate();
     },
     onError: (error: any) => {
       setSnackbar({
@@ -132,6 +137,7 @@ const ProductDetailsPage = ({
         message: "Review updated successfully!",
         severity: "success",
       });
+      revalidator.revalidate();
     },
     onError: (error: any) => {
       setSnackbar({
@@ -153,32 +159,12 @@ const ProductDetailsPage = ({
         message: "Review deleted successfully!",
         severity: "success",
       });
+      revalidator.revalidate();
     },
     onError: (error: any) => {
       setSnackbar({
         open: true,
         message: error.response?.data?.message || "Failed to delete review",
-        severity: "error",
-      });
-    },
-  });
-
-  const addReactionMutation = useMutation({
-    mutationFn: async (data: { reactions: string }) => {
-      return axios.post(`/products/${id}/reviews`, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["product", id] });
-      setSnackbar({
-        open: true,
-        message: "Reaction added successfully!",
-        severity: "success",
-      });
-    },
-    onError: (error: any) => {
-      setSnackbar({
-        open: true,
-        message: error.response?.data?.message || "Failed to add reaction",
         severity: "error",
       });
     },
@@ -201,6 +187,7 @@ const ProductDetailsPage = ({
         message: "Reaction updated successfully!",
         severity: "success",
       });
+      revalidator.revalidate();
     },
     onError: (error: any) => {
       setSnackbar({
@@ -233,9 +220,9 @@ const ProductDetailsPage = ({
 
   const handleSubmitReview = () => {
     if (editingReview) {
-      updateReviewMutation.mutate({ rating, review });
+      updateReviewMutation.mutate({ rating, review: review.trim() });
     } else {
-      addReviewMutation.mutate({ rating, review });
+      addReviewMutation.mutate({ rating, review: review.trim() });
     }
   };
 
@@ -436,18 +423,13 @@ const ProductDetailsPage = ({
                       <IconButton
                         size="small"
                         onClick={() =>
-                          review?.reactions &&
-                          !review?.reactions?.includes("Love")
-                            ? updateReactionMutation.mutate({
-                                reviewId: review._id,
-                                reactions: "Love",
-                              })
-                            : addReactionMutation.mutate({
-                                reactions: "Love",
-                              })
+                          updateReactionMutation.mutate({
+                            reviewId: review._id,
+                            reactions: "Love",
+                          })
                         }
                         color={`${
-                          review.reactions.includes("Love")
+                          review?.reactions?.includes("Love")
                             ? "error"
                             : "default"
                         }`}
@@ -460,18 +442,13 @@ const ProductDetailsPage = ({
                       <IconButton
                         size="small"
                         onClick={() =>
-                          review?.reactions &&
-                          !review?.reactions?.includes("Like")
-                            ? updateReactionMutation.mutate({
-                                reviewId: review._id,
-                                reactions: "Like",
-                              })
-                            : addReactionMutation.mutate({
-                                reactions: "Like",
-                              })
+                          updateReactionMutation.mutate({
+                            reviewId: review._id,
+                            reactions: "Like",
+                          })
                         }
                         color={`${
-                          review.reactions.includes("Like")
+                          review?.reactions?.includes("Like")
                             ? "primary"
                             : "default"
                         }`}
@@ -484,18 +461,13 @@ const ProductDetailsPage = ({
                       <IconButton
                         size="small"
                         onClick={() =>
-                          review?.reactions &&
-                          !review?.reactions?.includes("Dislike")
-                            ? updateReactionMutation.mutate({
-                                reviewId: review._id,
-                                reactions: "Dislike",
-                              })
-                            : addReactionMutation.mutate({
-                                reactions: "Dislike",
-                              })
+                          updateReactionMutation.mutate({
+                            reviewId: review._id,
+                            reactions: "Dislike",
+                          })
                         }
                         color={`${
-                          review.reactions.includes("Dislike")
+                          review?.reactions?.includes("Dislike")
                             ? "primary"
                             : "default"
                         }`}
@@ -549,7 +521,7 @@ const ProductDetailsPage = ({
             <Button
               variant="contained"
               onClick={handleSubmitReview}
-              disabled={!rating || !review}
+              disabled={!rating || !review.trim()}
             >
               {editingReview ? "Update Review" : "Submit Review"}
             </Button>
