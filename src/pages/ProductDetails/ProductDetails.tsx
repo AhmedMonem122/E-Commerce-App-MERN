@@ -390,28 +390,30 @@ const ProductDetailsPage = ({
                       <Stack direction="row" spacing={2} alignItems="center">
                         <Typography variant="h6">
                           {review.user.name}
-                          {hasUserReviewed() && " (You)"}
+                          {userData?.data?.user?._id === review?.user?._id &&
+                            " (You)"}
                         </Typography>
                         <Rating value={review.rating} readOnly size="small" />
                       </Stack>
-                      {isAuthenticated && hasUserReviewed() && (
-                        <Stack direction="row" spacing={1}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleOpenReviewDialog(review)}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              deleteReviewMutation.mutate(review._id)
-                            }
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Stack>
-                      )}
+                      {isAuthenticated &&
+                        userData?.data?.user?._id === review?.user?._id && (
+                          <Stack direction="row" spacing={1}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleOpenReviewDialog(review)}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() =>
+                                deleteReviewMutation.mutate(review._id)
+                              }
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Stack>
+                        )}
                     </Stack>
                     <Typography color="text.secondary" sx={{ mb: 1 }}>
                       {new Date(review.createdAt).toLocaleDateString()}
