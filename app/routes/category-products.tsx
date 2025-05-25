@@ -2,18 +2,19 @@ import axios from "src/api/axios";
 import type { Route } from "./+types/category-products";
 import type { AxiosError } from "axios";
 import CategoryBrandProductsPage from "src/pages/CategoryBrandProducts/CategoryBrandProducts";
+import CategoryBrandProductsSkeleton from "src/pages/CategoryBrandProducts/CategoryBrandProductsSkeleton";
 
 export function meta({ data }: Route.MetaArgs) {
   return [
     {
       title: `Trust Cart | ${
-        data?.data?.data?.category?.title || "Category Products"
+        data?.data?.data?.products[0]?.category?.title || "Category Products"
       }`,
     },
     {
       name: "description",
       content: `Browse our collection of products in ${
-        data?.data?.data?.category?.title || "this category"
+        data?.data?.data?.products[0]?.category?.title || "this category"
       }`,
     },
   ];
@@ -62,9 +63,9 @@ export async function clientLoader({
   }
 }
 
-//   export function HydrateFallback() {
-//     return <ProductDetailsSkeleton />;
-//   }
+export function HydrateFallback() {
+  return <CategoryBrandProductsSkeleton />;
+}
 
 const CategoryProducts = ({ loaderData }: Route.ComponentProps) => {
   return <CategoryBrandProductsPage {...loaderData} />;
