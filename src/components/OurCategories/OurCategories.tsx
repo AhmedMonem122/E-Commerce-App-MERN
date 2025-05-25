@@ -143,9 +143,7 @@ const OurCategories = () => {
                     }}
                   >
                     <CardActionArea
-                      onClick={() =>
-                        navigate(`/categories/${category.title.toLowerCase()}`)
-                      }
+                      onClick={() => navigate(`/categories/${category._id}`)}
                       sx={{ height: "100%", p: 2 }}
                     >
                       <CardContent

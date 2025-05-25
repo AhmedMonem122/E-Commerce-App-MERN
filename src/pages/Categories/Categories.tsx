@@ -108,9 +108,7 @@ const CategoriesPage = () => {
                       },
                     },
                   }}
-                  onClick={() =>
-                    navigate(`/categories/${category.title.toLowerCase()}`)
-                  }
+                  onClick={() => navigate(`/categories/${category._id}`)}
                 >
                   <Box sx={{ position: "relative", pt: "60%" }}>
                     <CardMedia

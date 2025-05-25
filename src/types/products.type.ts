@@ -25,6 +25,7 @@ export interface Product {
     createdAt: string;
   };
   ratingsAverage: number;
+  ratingsQuantity: number;
   id: string;
   images: string[];
   category: {
