@@ -19,8 +19,10 @@ import { useState } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import CloseIcon from "@mui/icons-material/Close";
 import type { Product } from "src/types/products.type";
-import { Link, useSearchParams } from "react-router";
+import { Link, useLocation, useSearchParams } from "react-router";
 import FilterSection from "./FilterSection";
+import { useQuery } from "@tanstack/react-query";
+import axios from "../../api/axios";
 
 const CategoryBrandProductsPage = ({
   id,
@@ -46,13 +48,23 @@ const CategoryBrandProductsPage = ({
   const products = data?.data?.products || [];
   const totalPages = data?.metadata?.numberOfPages || 0;
 
+  const { pathname } = useLocation();
+
+  const categoryBrandData = useQuery({
+    queryKey: [pathname.startsWith("/categories") ? "category" : "brand"],
+    queryFn: async () => {
+      const response = await axios.get(pathname);
+      return await response.data;
+    },
+  });
+
   return (
     <Box sx={{ py: 4, backgroundColor: "#F8FAFC" }}>
       <Container maxWidth="xl">
         <Stack direction="row" justifyContent="space-between" sx={{ mb: 4 }}>
           <Typography variant="h4" fontWeight={600}>
-            {data?.data?.products[0]?.category?.title ||
-              data?.data?.products[0]?.brand?.title ||
+            {categoryBrandData?.data?.data?.category?.title ||
+              categoryBrandData?.data?.data?.brand?.title ||
               "Products"}
           </Typography>
           {isMobile && (

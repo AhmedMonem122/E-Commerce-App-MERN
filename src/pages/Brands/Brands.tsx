@@ -20,6 +20,7 @@ import { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../../api/axios";
+import { Link } from "react-router";
 
 type Brand = {
   _id: string;
@@ -193,7 +194,13 @@ const BrandsPage = () => {
                 </Grid>
               ))
             : data?.data?.brands.map((brand: Brand) => (
-                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={brand._id}>
+                <Grid
+                  component={Link}
+                  to={`/brands/${brand._id}`}
+                  size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+                  key={brand._id}
+                  sx={{ textDecoration: "none" }}
+                >
                   <Card
                     sx={{
                       height: "100%",

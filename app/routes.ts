@@ -12,4 +12,5 @@ export default [
   route("brands", "routes/brands.tsx"),
   route("categories", "routes/categories.tsx"),
   route("categories/:id", "routes/category-products.tsx"),
+  route("brands/:id", "routes/brand-products.tsx"),
 ] satisfies RouteConfig;
