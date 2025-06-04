@@ -228,7 +228,7 @@ const ProductDetailsPage = ({
 
   const hasUserReviewed = () => {
     return data?.data?.product?.reviews.some(
-      (review) => review.user._id === userData?.data?.user?._id
+      (review) => review?.user?._id === userData?.data?.user?._id
     );
   };
 
@@ -388,10 +388,22 @@ const ProductDetailsPage = ({
                       sx={{ mb: 2 }}
                     >
                       <Stack direction="row" spacing={2} alignItems="center">
-                        <Typography variant="h6">
-                          {review.user.name}
-                          {userData?.data?.user?._id === review?.user?._id &&
-                            " (You)"}
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            color: !review?.user
+                              ? "error.main"
+                              : "text.primary",
+                          }}
+                        >
+                          {review?.user?.name}
+                          {userData &&
+                          review?.user &&
+                          userData?.data?.user?._id === review?.user?._id
+                            ? " (You)"
+                            : !review?.user
+                            ? "Deleted User"
+                            : ""}
                         </Typography>
                         <Rating value={review.rating} readOnly size="small" />
                       </Stack>
