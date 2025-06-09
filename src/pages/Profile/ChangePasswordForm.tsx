@@ -238,8 +238,11 @@ const ChangePasswordForm = () => {
             color="primary"
             startIcon={<LockIcon />}
             sx={{ mt: 2 }}
+            disabled={updatePasswordMutation.isPending}
           >
-            Change Password
+            {updatePasswordMutation.isPending
+              ? "Updating..."
+              : "Update Password"}
           </Button>
         </Grid>
       </Grid>

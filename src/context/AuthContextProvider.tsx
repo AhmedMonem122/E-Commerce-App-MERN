@@ -9,6 +9,7 @@ interface AuthContextType {
   handleLogout: () => void;
   data: any;
   isLoading: boolean;
+  refetch: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -18,7 +19,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       const response = await axios.get("/users/me");
@@ -48,6 +49,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         handleLogout,
         data,
         isLoading,
+        refetch,
       }}
     >
       {children}

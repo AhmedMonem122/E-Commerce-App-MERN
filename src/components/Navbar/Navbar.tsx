@@ -38,7 +38,7 @@ const pages = [
 ];
 
 const Navbar = () => {
-  const { isAuthenticated, handleLogout } = useAuth();
+  const { isAuthenticated, handleLogout, data } = useAuth();
 
   const navigate = useNavigate();
 
@@ -233,7 +233,10 @@ const Navbar = () => {
               </IconButton>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar sx={{ bgcolor: "#3B82F6" }}>
+                  <Avatar
+                    src={data?.data?.user?.photo || undefined}
+                    sx={{ bgcolor: "#3B82F6" }}
+                  >
                     <PersonIcon />
                   </Avatar>
                 </IconButton>
