@@ -1,5 +1,6 @@
 import ProfilePage from "src/pages/Profile/Profile";
 import type { Route } from "./+types/profile";
+import ProtectedRoute from "src/components/ProtectedRoute/ProtectedRoute";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -12,7 +13,11 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 const Profile = () => {
-  return <ProfilePage />;
+  return (
+    <ProtectedRoute roles={["admin", "user"]}>
+      <ProfilePage />
+    </ProtectedRoute>
+  );
 };
 
 export default Profile;
