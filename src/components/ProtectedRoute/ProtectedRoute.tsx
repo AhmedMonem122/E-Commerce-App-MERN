@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
 import { Navigate } from "react-router";
 import useAuth from "../../hooks/use-auth";
-import { Box, CircularProgress } from "@mui/material";
+import Loading from "../Loading/Loading";
+import { useEffect, useState } from "react";
 
 const ProtectedRoute = ({
   children,
@@ -10,35 +10,36 @@ const ProtectedRoute = ({
   children: React.ReactNode;
   roles: string[];
 }) => {
-  const { isAuthenticated, data } = useAuth();
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const { isAuthenticated, data, isLoading } = useAuth();
+
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
-    setIsCheckingAuth(false);
-  }, []);
+    setIsInitialLoading(isLoading);
+  }, [isLoading]);
 
-  if (isCheckingAuth) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+  if (isLoading) {
+    return <Loading />;
   }
 
-  if (!data && !isAuthenticated) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  if (!isAuthenticated && !data && !isLoading && !isInitialLoading) {
     return <Navigate to="/login" replace />;
   }
 
-  if (roles.length && roles.includes(data?.data?.user?.role)) {
-    return children;
-  } else return !isCheckingAuth ? <Navigate to="/login" replace /> : children;
+  if (
+    roles.length > 0 &&
+    !roles.includes(data?.data?.user?.role) &&
+    !isLoading &&
+    !isInitialLoading
+  ) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 };
 
 export default ProtectedRoute;
