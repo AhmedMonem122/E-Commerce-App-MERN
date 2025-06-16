@@ -10,8 +10,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import Navbar from "src/components/Navbar/Navbar";
-import Footer from "src/components/Footer/Footer";
 import AuthContextProvider from "src/context/AuthContextProvider";
 
 export const links: Route.LinksFunction = () => [
@@ -46,9 +44,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <QueryClientProvider client={queryClient}>
           <AuthContextProvider>
-            <Navbar />
             {children}
-            <Footer />
+
             <ScrollRestoration />
             <Scripts />
           </AuthContextProvider>
