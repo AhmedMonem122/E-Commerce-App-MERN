@@ -1,8 +1,9 @@
+import Overview from "src/pages/Dashboard/ReusablePages/Overview/Overview";
 import type { Route } from "./+types/admin-dashboard-overview";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Trust Cart | Admin Dashboard" },
+    { title: "Trust Cart | Admin Dashboard | Overview" },
     {
       name: "description",
       content:
@@ -11,7 +12,7 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 const AdminDashboardOverview = () => {
-  return <div>AdminDashboardOverview</div>;
+  return <Overview />;
 };
 
 export default AdminDashboardOverview;

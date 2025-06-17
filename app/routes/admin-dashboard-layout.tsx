@@ -1,5 +1,6 @@
 import DashboardLayout from "src/reusableComponents/DashboardLayout/DashboardLayout";
 import type { Route } from "./+types/admin-dashboard-layout";
+import ProtectedRoute from "src/components/ProtectedRoute/ProtectedRoute";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -12,7 +13,11 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 const AdminDashboardLayout = () => {
-  return <DashboardLayout isAdmin />;
+  return (
+    <ProtectedRoute roles={["admin"]}>
+      <DashboardLayout isAdmin />
+    </ProtectedRoute>
+  );
 };
 
 export default AdminDashboardLayout;

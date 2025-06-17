@@ -11,14 +11,18 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useState } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { NavLink, Outlet, useNavigate } from "react-router";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import SettingsIcon from "@mui/icons-material/Settings";
 import { AppBar, IconButton, Typography } from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import CategoryIcon from "@mui/icons-material/Category";
+import RateReviewIcon from "@mui/icons-material/RateReview";
+import PaymentIcon from "@mui/icons-material/Payment";
+import LocalMallIcon from "@mui/icons-material/LocalMall";
 
 const drawerWidth = 240;
 
@@ -35,12 +39,71 @@ const DashboardLayout = ({ isAdmin = false }: DashboardLayoutProps) => {
   };
 
   const menuItems = [
-    { text: "Dashboard", icon: <DashboardIcon />, path: "/" },
-    { text: "Products", icon: <ShoppingCartIcon />, path: "/products" },
-    { text: "Users", icon: <PeopleIcon />, path: "/users" },
+    { text: "Home", icon: <HomeIcon />, path: "/" },
+    {
+      text: "Overview",
+      icon: <AssessmentIcon />,
+      path: `${
+        isAdmin ? "/admin/dashboard/overview" : "/user/dashboard/overview"
+      }`,
+    },
+    {
+      text: "Products",
+      icon: <ShoppingCartIcon />,
+      path: `${
+        isAdmin ? "/admin/dashboard/products" : "/user/dashboard/products"
+      }`,
+    },
     ...(isAdmin
-      ? [{ text: "Settings", icon: <SettingsIcon />, path: "/settings" }]
-      : []),
+      ? [
+          {
+            text: "Users",
+            icon: <PeopleIcon />,
+            path: "/admin/dashboard/users",
+          },
+          {
+            text: "Brands",
+            icon: <LocalMallIcon />,
+            path: "/admin/dashboard/brands",
+          },
+          {
+            text: "Categories",
+            icon: <CategoryIcon />,
+            path: "/admin/dashboard/categories",
+          },
+          {
+            text: "Reviews",
+            icon: <RateReviewIcon />,
+            path: "/admin/dashboard/reviews",
+          },
+          {
+            text: "Payments",
+            icon: <PaymentIcon />,
+            path: "/admin/dashboard/payments",
+          },
+        ]
+      : [
+          {
+            text: "Brands",
+            icon: <LocalMallIcon />,
+            path: "/user/dashboard/brands",
+          },
+          {
+            text: "Categories",
+            icon: <CategoryIcon />,
+            path: "/user/dashboard/categories",
+          },
+          {
+            text: "Reviews",
+            icon: <RateReviewIcon />,
+            path: "/user/dashboard/reviews",
+          },
+          {
+            text: "Orders",
+            icon: <ShoppingCartIcon />,
+            path: "/user/dashboard/orders",
+          },
+        ]),
   ];
 
   return (
@@ -49,7 +112,7 @@ const DashboardLayout = ({ isAdmin = false }: DashboardLayoutProps) => {
       <AppBar
         position="fixed"
         sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
+          zIndex: 9999999999,
           background: "linear-gradient(135deg, #3f51b5 0%, #2196f3 100%)",
           boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
           transition: "all 0.3s ease",
@@ -94,9 +157,11 @@ const DashboardLayout = ({ isAdmin = false }: DashboardLayoutProps) => {
             boxShadow: "2px 0 10px rgba(0,0,0,0.05)",
             transition: "all 0.3s ease",
             position: "fixed",
+            zIndex: 999999,
           },
           position: "fixed",
           height: "100%",
+          zIndex: 999999,
         }}
         open={open}
         onClose={toggleDrawer}
@@ -107,7 +172,8 @@ const DashboardLayout = ({ isAdmin = false }: DashboardLayoutProps) => {
             {menuItems.map((item) => (
               <ListItem key={item.text} disablePadding>
                 <ListItemButton
-                  onClick={() => navigate(item.path)}
+                  component={NavLink}
+                  to={item.path}
                   sx={{
                     borderRadius: "0 20px 20px 0",
                     mx: 1,
@@ -116,6 +182,13 @@ const DashboardLayout = ({ isAdmin = false }: DashboardLayoutProps) => {
                     },
                     "&.Mui-selected": {
                       backgroundColor: "rgba(63, 81, 181, 0.15)",
+                    },
+                    "&.active": {
+                      backgroundColor: "rgba(63, 81, 181, 0.15)",
+                    },
+                    "&.active .MuiTypography-root": {
+                      fontWeight: "bold",
+                      color: "primary.main",
                     },
                   }}
                 >
