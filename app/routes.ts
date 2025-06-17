@@ -24,4 +24,7 @@ export default [
   layout("routes/admin-dashboard-layout.tsx", [
     route("admin/dashboard/overview", "routes/admin-dashboard-overview.tsx"),
   ]),
+  layout("routes/user-dashboard-layout.tsx", [
+    route("user/dashboard/overview", "routes/user-dashboard-overview.tsx"),
+  ]),
 ] satisfies RouteConfig;
