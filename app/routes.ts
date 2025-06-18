@@ -24,6 +24,10 @@ export default [
   layout("routes/admin-dashboard-layout.tsx", [
     route("admin/dashboard/overview", "routes/admin-dashboard-overview.tsx"),
     route("admin/dashboard/products", "routes/admin-dashboard-products.tsx"),
+    route(
+      "admin/dashboard/products/add",
+      "routes/admin-dashboard-add-product.tsx"
+    ),
   ]),
   layout("routes/user-dashboard-layout.tsx", [
     route("user/dashboard/overview", "routes/user-dashboard-overview.tsx"),

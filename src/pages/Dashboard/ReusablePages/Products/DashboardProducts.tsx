@@ -88,7 +88,7 @@ const DashboardProducts = ({ isAdmin = false }: DashboardProductsProps) => {
             color="primary"
             startIcon={<AddIcon />}
             component={Link}
-            to="/admin/products/add"
+            to="/admin/dashboard/products/add"
           >
             Add Product
           </Button>
@@ -155,7 +155,7 @@ const DashboardProducts = ({ isAdmin = false }: DashboardProductsProps) => {
                             size="small"
                             startIcon={<EditIcon />}
                             component={Link}
-                            to={`/admin/products/edit/${product.id}`}
+                            to={`/admin/dashboard/products/edit/${product.id}`}
                           >
                             Edit
                           </Button>
