@@ -23,8 +23,10 @@ export default [
   ]),
   layout("routes/admin-dashboard-layout.tsx", [
     route("admin/dashboard/overview", "routes/admin-dashboard-overview.tsx"),
+    route("admin/dashboard/products", "routes/admin-dashboard-products.tsx"),
   ]),
   layout("routes/user-dashboard-layout.tsx", [
     route("user/dashboard/overview", "routes/user-dashboard-overview.tsx"),
+    route("user/dashboard/products", "routes/user-dashboard-products.tsx"),
   ]),
 ] satisfies RouteConfig;
