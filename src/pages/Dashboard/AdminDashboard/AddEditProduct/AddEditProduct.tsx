@@ -315,11 +315,14 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
                   onChange={handleImageCoverChange}
                 />
               </Button>
+              {/* Show cover image as a Chip with Avatar and delete button */}
               {imageCover && (
-                <Box mt={2}>
-                  <Typography variant="body2">
-                    Selected: {imageCover.name}
-                  </Typography>
+                <Box mt={2} display="flex" gap={1}>
+                  <Chip
+                    avatar={<Avatar src={URL.createObjectURL(imageCover)} />}
+                    label={imageCover.name}
+                    onDelete={() => setImageCover(null)}
+                  />
                 </Box>
               )}
               {state.imageCoverError && (
