@@ -28,6 +28,10 @@ export default [
       "admin/dashboard/products/add",
       "routes/admin-dashboard-add-product.tsx"
     ),
+    route(
+      "admin/dashboard/products/edit/:id",
+      "routes/admin-dashboard-edit-product.tsx"
+    ),
   ]),
   layout("routes/user-dashboard-layout.tsx", [
     route("user/dashboard/overview", "routes/user-dashboard-overview.tsx"),

@@ -1,4 +1,4 @@
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -13,6 +13,8 @@ import {
   Grid,
   Chip,
   Avatar,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/material/styles";
@@ -57,6 +59,15 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
   const { id } = useParams();
   const [imageCover, setImageCover] = useState<File | null>(null);
   const [images, setImages] = useState<File[]>([]);
+  const [toast, setToast] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "warning" | "info";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   // Fetch product data if in edit mode
   const { data: productData } = useQuery({
@@ -85,15 +96,15 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
   });
 
   const initialState: ProductState = {
-    title: "",
+    title: productData?.data?.product?.title || "",
     titleError: null,
-    description: "",
+    description: productData?.data?.product?.description || "",
     descriptionError: null,
-    price: "",
+    price: productData?.data?.product?.price?.toString() || "",
     priceError: null,
-    brand: "",
+    brand: productData?.data?.product?.brand || "",
     brandError: null,
-    category: "",
+    category: productData?.data?.product?.category || "",
     categoryError: null,
     imageCover: null,
     imageCoverError: null,
@@ -181,8 +192,20 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
         await editProductMutation.mutateAsync(data);
       }
 
+      setToast({
+        open: true,
+        message: `Product ${
+          mode === "add" ? "added" : "updated"
+        } successfully!`,
+        severity: "success",
+      });
       return initialState;
     } catch (error) {
+      setToast({
+        open: true,
+        message: `Failed to ${mode === "add" ? "add" : "update"} product.`,
+        severity: "error",
+      });
       return {
         ...newState,
         titleError: "Failed to save product",
@@ -195,10 +218,43 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
     initialState
   );
 
+  // Update state when productData changes for edit mode
+  useEffect(() => {
+    if (productData?.data?.product && mode === "edit") {
+      const updatedState = {
+        title: productData.data.product.title || "",
+        titleError: null,
+        description: productData.data.product.description || "",
+        descriptionError: null,
+        price: productData.data.product.price?.toString() || "",
+        priceError: null,
+        brand: productData.data.product.brand?._id || "",
+        brandError: null,
+        category: productData.data.product.category?._id || "",
+        categoryError: null,
+        imageCover: null,
+        imageCoverError: null,
+        images: [],
+        imagesError: null,
+      };
+
+      // Update the action state
+      formAction(new FormData());
+
+      // Set existing images if available
+      if (
+        productData.data.product.images &&
+        productData.data.product.images.length > 0
+      ) {
+        setImages(productData.data.product.images);
+      }
+    }
+  }, [productData, mode, formAction]);
+
   const handleImageCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImageCover(e.target.files[0]);
-      state.imageCover = imageCover;
+      const file = e.target.files[0];
+      setImageCover(file);
     }
   };
 
@@ -206,19 +262,23 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
     if (e.target.files) {
       const newImages = Array.from(e.target.files).slice(0, 4);
       setImages(newImages);
-      state.images = images;
     }
   };
 
   const removeImage = (index: number) => {
-    setImages(state.images.filter((_, i) => i !== index));
-    state.images = images;
+    setImages(images.filter((_, i) => i !== index));
   };
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
         {mode === "add" ? "Add Product" : "Edit Product"}
+      </Typography>
+
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+        {mode === "add"
+          ? "Create a new product by filling out the form below. All fields are required to ensure complete product information."
+          : "Update the product information below. You can modify any field to reflect the latest product details."}
       </Typography>
 
       <Paper elevation={3} sx={{ p: 4 }}>
@@ -352,8 +412,16 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
                 {images.map((img, index) => (
                   <Chip
                     key={index}
-                    avatar={<Avatar src={URL.createObjectURL(img)} />}
-                    label={img.name}
+                    avatar={
+                      <Avatar
+                        src={
+                          img instanceof File ? URL.createObjectURL(img) : img // If it's a string URL from API
+                        }
+                      />
+                    }
+                    label={
+                      img instanceof File ? img.name : `Image ${index + 1}` // For existing images from API
+                    }
                     onDelete={() => removeImage(index)}
                   />
                 ))}
@@ -379,6 +447,21 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
           </Grid>
         </Box>
       </Paper>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={6000}
+        onClose={() => setToast({ ...toast, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Alert
+          onClose={() => setToast({ ...toast, open: false })}
+          severity={toast.severity}
+          sx={{ width: "100%" }}
+        >
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
