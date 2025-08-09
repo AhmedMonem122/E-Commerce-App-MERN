@@ -238,8 +238,15 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
         imagesError: null,
       };
 
+      const formData = new FormData();
+      formData.append("title", updatedState.title);
+      formData.append("description", updatedState.description);
+      formData.append("price", updatedState.price);
+      formData.append("brand", productData.data.product.brand?._id);
+      formData.append("category", productData.data.product.category?._id);
+
       // Update the action state
-      formAction(new FormData());
+      formAction(formData);
 
       // Set existing images if available
       if (
@@ -298,6 +305,7 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
                 error={!!state.titleError}
                 helperText={state.titleError}
                 required
+                focused={mode === "edit"}
               />
             </Grid>
 
@@ -312,6 +320,7 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
                 error={!!state.descriptionError}
                 helperText={state.descriptionError}
                 required
+                focused={mode === "edit"}
               />
             </Grid>
 
@@ -326,6 +335,7 @@ const AddEditProduct = ({ mode = "add" }: AddEditProductProps) => {
                 helperText={state.priceError}
                 inputProps={{ step: "0.01" }}
                 required
+                focused={mode === "edit"}
               />
             </Grid>
 
