@@ -32,6 +32,7 @@ export default [
       "admin/dashboard/products/edit/:id",
       "routes/admin-dashboard-edit-product.tsx"
     ),
+    route("admin/dashboard/users", "routes/admin-dashboard-users.tsx"),
   ]),
   layout("routes/user-dashboard-layout.tsx", [
     route("user/dashboard/overview", "routes/user-dashboard-overview.tsx"),
