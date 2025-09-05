@@ -20,9 +20,10 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import AddIcon from "@mui/icons-material/Add";
 import ConfirmationDialog from "../../../../components/ConfirmationDialog/ConfirmationDialog";
 import type { Product } from "src/types/products.type";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "../../../../api/axios";
 import { Avatar } from "@mui/material";
+import { Snackbar, Alert } from "@mui/material";
 
 interface DashboardProductsProps {
   isAdmin?: boolean;
@@ -33,6 +34,11 @@ const DashboardProducts = ({ isAdmin = false }: DashboardProductsProps) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const data = useQuery({
     queryKey: ["products", page, rowsPerPage],
@@ -44,6 +50,28 @@ const DashboardProducts = ({ isAdmin = false }: DashboardProductsProps) => {
         },
       });
       return res.data;
+    },
+  });
+
+  const deleteProduct = useMutation({
+    mutationFn: async (id: string) => {
+      await axios.delete(`/products/${id}`);
+    },
+    onSuccess: () => {
+      data.refetch();
+      setOpenDialog(false);
+      setSnackbar({
+        open: true,
+        message: "Product deleted successfully!",
+        severity: "success",
+      });
+    },
+    onError: (error: any) => {
+      setSnackbar({
+        open: true,
+        message: error?.response?.data?.message || "Failed to delete product.",
+        severity: "error",
+      });
     },
   });
 
@@ -64,9 +92,9 @@ const DashboardProducts = ({ isAdmin = false }: DashboardProductsProps) => {
   };
 
   const handleDeleteConfirm = () => {
-    // Add your delete logic here
-    console.log("Deleting product:", selectedProduct);
-    setOpenDialog(false);
+    if (selectedProduct) {
+      deleteProduct.mutate(selectedProduct);
+    }
   };
 
   return (
@@ -196,6 +224,20 @@ const DashboardProducts = ({ isAdmin = false }: DashboardProductsProps) => {
         title="Delete Product"
         message="Are you sure you want to delete this product? This action cannot be undone."
       />
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity as any}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
