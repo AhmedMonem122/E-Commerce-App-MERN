@@ -24,6 +24,7 @@ import axios from "../../../../api/axios";
 import { Avatar } from "@mui/material";
 import { Snackbar, Alert } from "@mui/material";
 import type { User } from "src/types/users.type";
+import { Select, MenuItem, FormControl } from "@mui/material";
 
 const DashboardUsers = () => {
   const [page, setPage] = useState(0);
@@ -46,6 +47,27 @@ const DashboardUsers = () => {
         },
       });
       return res.data;
+    },
+  });
+
+  const updateUserRole = useMutation({
+    mutationFn: async ({ id, role }: { id: string; role: string }) => {
+      await axios.patch(`/users/${id}`, { role });
+    },
+    onSuccess: () => {
+      data.refetch();
+      setSnackbar({
+        open: true,
+        message: "Role updated successfully!",
+        severity: "success",
+      });
+    },
+    onError: (error: any) => {
+      setSnackbar({
+        open: true,
+        message: error?.response?.data?.message || "Failed to update role.",
+        severity: "error",
+      });
     },
   });
 
@@ -142,7 +164,23 @@ const DashboardUsers = () => {
                   </TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
+                  <TableCell>
+                    {" "}
+                    <FormControl size="small" fullWidth>
+                      <Select
+                        value={user.role}
+                        onChange={(e) =>
+                          updateUserRole.mutate({
+                            id: user._id,
+                            role: e.target.value,
+                          })
+                        }
+                      >
+                        <MenuItem value="user">user</MenuItem>
+                        <MenuItem value="admin">admin</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </TableCell>
                   <TableCell align="center">
                     <Box
                       sx={{
