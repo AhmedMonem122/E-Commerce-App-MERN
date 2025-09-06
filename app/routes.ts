@@ -34,6 +34,10 @@ export default [
     ),
     route("admin/dashboard/users", "routes/admin-dashboard-users.tsx"),
     route("admin/dashboard/users/add", "routes/admin-dashboard-add-user.tsx"),
+    route(
+      "admin/dashboard/users/edit/:id",
+      "routes/admin-dashboard-edit-user.tsx"
+    ),
   ]),
   layout("routes/user-dashboard-layout.tsx", [
     route("user/dashboard/overview", "routes/user-dashboard-overview.tsx"),
